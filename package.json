@@ -1,0 +1,26 @@
+{
+  "name": "rollingcodeclubbackend",
+  "version": "1.0.0",
+  "description": "Backend del proyecto de fin de modulo de una pagina para alquilar canchas de futbol y e-commerce de productos relacionados con gestion de roles.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "alquiler",
+    "canchas",
+    "e-commerce"
+  ],
+  "author": "Claudia Ximena Barrientos, Alessandra Borges Licciardi, Jose David Baza",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "express-validator": "^7.2.1",
+    "mongoose": "^8.18.3",
+    "morgan": "^1.10.1",
+    "multer": "^2.0.2"
+  }
+}
