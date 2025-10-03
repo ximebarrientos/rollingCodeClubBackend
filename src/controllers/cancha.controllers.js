@@ -1,3 +1,5 @@
+import Cancha from "../models/cancha.js"
+
 
 
 export const prueba= (req, res) => {
@@ -7,9 +9,11 @@ export const prueba= (req, res) => {
 
 export const crearCancha= async(req, res) => {
     try {
-        console.log(req.body)
-        res.send("desde la logica de crear producto")
+        const canchaNueva= new Cancha(req.body);
+        await canchaNueva.save();
+        res.status(201).json({mensaje:"Cancha creada con exito"})
     } catch (error) {
-        console.error(error)
+        console.error(error);
+        res.status(500).json({mensaje:"Error al crear la cancha"})
     }
 }
