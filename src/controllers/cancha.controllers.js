@@ -17,3 +17,13 @@ export const crearCancha= async(req, res) => {
         res.status(500).json({mensaje:"Error al crear la cancha"})
     }
 }
+
+export const obtenerCanchas= async(req, res) => {
+    try {
+        const listaCanchas= await Cancha.find();
+        res.status(200).json(listaCanchas)
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({mensaje:"Error al obtener las canchas"})
+    }
+}
