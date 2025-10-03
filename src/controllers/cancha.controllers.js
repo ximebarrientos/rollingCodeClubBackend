@@ -38,3 +38,18 @@ export const obtenerCanchaPorId = async (req, res) => {
     res.status(500).json({ mensaje: "Error al obtener la cancha por ID" });
   }
 };
+
+export const borrarCanchaPorID = async (req, res) => {
+  try {
+    const canchaEliminada = await Cancha.findByIdAndDelete(req.params.id);
+    if (!canchaEliminada) {
+      return res
+        .status(404)
+        .json({ mensaje: "Cancha no encontrada para eliminar" });
+    }
+    res.status(200).json({ mensaje: "Cancha eliminada con exito" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: "Error al eliminar la cancha" });
+  }
+};
