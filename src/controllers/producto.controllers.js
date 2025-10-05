@@ -16,17 +16,27 @@ export const crearProducto= async(req, res) => {
         
     } catch (error) {
         console.error(error)
-        res.status(500).json({mensaje:"Error al crear el producto", error:error.message})
+        res.status(500).json({mensaje:"Error al crear el producto"})
     }
 }
 
-export const obtenerProductos= async(req, res) => {
-    try {
-        const listaProductos = await Producto.find();
-        res.status(200).json(listaProductos);
-        
-    } catch (error) {
-        console.error(error)
-        res.status(500).json({mensaje:"Error al obtener los productos", error:error.message})
-    }
+export const obtenerProductos = async (req, res) => {
+  try {
+    const { categoria, subcategoria } = req.query;
+
+    const filtro = {};
+
+    if (categoria) filtro.categoria = categoria;
+    if (subcategoria) filtro.subcategoria = subcategoria;
+
+    console.log("Filtro usado:", filtro);
+
+    const listaProductos = await Producto.find(filtro);
+
+    res.status(200).json(listaProductos);
+  } catch (error) {
+    console.error("Error en obtenerProductos:", error);
+    res.status(500).json({
+      mensaje: "Error al obtener los productos"});
+  }
 }
