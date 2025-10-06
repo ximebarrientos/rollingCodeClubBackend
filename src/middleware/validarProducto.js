@@ -8,16 +8,19 @@ const validacionProducto = [
     .withMessage("El nombre del producto es obligatorio.")
     .isLength({ min: 3, max: 100 })
     .withMessage("El nombre del producto debe tener entre 3 y 100 caracteres.")
-    .custom(async (valor) => {
+    .custom(async (valor, {req}) => {
       const productoExistente = await Producto.findOne({
         nombreProducto: valor,
       });
-      if (productoExistente) {
-        throw new Error(
-          "Ya existe un producto con este nombre. El nombre debe ser único."
-        );
+      if (!productoExistente) {
+        return true;
       }
-      return true;
+      if (req.params.id && req.params.id === productoExistente._id.toString()) {
+        return true;
+      }
+      throw new Error(
+          "Ya existe un producto con este nombre."
+        );
     }),
 
   body("precio")
