@@ -1,12 +1,18 @@
 import Usuario from "../models/usuario.js";
-
-export const pruebaUsuario = (req, res) => {
-  res.status(200).send("Mensaje desde el controlador de usuarios");
-};
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export const registrarUsuario = async (req, res) => {
   try {
-    const usuarioNuevo = new Usuario(req.body);
+    const { password, ...resto } = req.body;
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const usuarioNuevo = new Usuario({
+      ...resto,
+      password: hashedPassword,
+    });
 
     await usuarioNuevo.save();
 
@@ -62,7 +68,12 @@ export const obtenerUsuarioPorId = async (req, res) => {
 
 export const editarUsuarioPorId = async (req, res) => {
   try {
-    let datosAActualizar = req.body;
+    const { password, ...datosAActualizar } = req.body;
+
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      datosAActualizar.password = await bcrypt.hash(password, salt);
+    }
 
     const usuarioEditado = await Usuario.findByIdAndUpdate(
       req.params.id,
@@ -95,5 +106,56 @@ export const borrarUsuarioPorId = async (req, res) => {
   } catch (error) {
     console.error("Error al borrar usuario:", error);
     res.status(500).json({ mensaje: "Error al borrar el usuario por el Id." });
+  }
+};
+
+export const login = async (req, res) => {
+  try {
+    const { correoElectronico, password } = req.body;
+
+    const usuarioEncontrado = await Usuario.findOne({ correoElectronico });
+    if (!usuarioEncontrado) {
+      return res
+        .status(400)
+        .json({
+          mensaje: "Credenciales inválidas (email o contraseña incorrectos).",
+        });
+    }
+
+    const passwordValida = await bcrypt.compare(
+      password,
+      usuarioEncontrado.password
+    );
+    if (!passwordValida) {
+      return res
+        .status(400)
+        .json({
+          mensaje: "Credenciales inválidas (email o contraseña incorrectos).",
+        });
+    }
+
+    const token = jwt.sign(
+      {
+        id: usuarioEncontrado._id,
+        rol: usuarioEncontrado.rol,
+      },
+      process.env.JWT_SECRET || "RoLlInGcOdE$Jm1tPq8y*!xZcWvB4",
+      { expiresIn: "24h" }
+    );
+
+    res.status(200).json({
+      mensaje: "Inicio de sesión exitoso.",
+      usuario: {
+        id: usuarioEncontrado._id,
+        nombreUsuario: usuarioEncontrado.nombreUsuario,
+        rol: usuarioEncontrado.rol,
+      },
+      token,
+    });
+  } catch (error) {
+    console.error("Error en login:", error);
+    res
+      .status(500)
+      .json({ mensaje: "Error interno al intentar iniciar sesión." });
   }
 };
