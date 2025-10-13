@@ -1,9 +1,9 @@
-import cloudinary from "./cloudinary"
+import cloudinary from "./cloudinary.js"
 
 const subirImagenCloudinary = (buffer) => {
     return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
-            { folder: 'productos'},
+            { folder: 'imagenesRollingCodeClub'},
             (error, result) => {
                 if (result){
                     resolve(result);
