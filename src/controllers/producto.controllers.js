@@ -1,3 +1,4 @@
+import subirImagenCloudinary from "../helpers/cloudinaryUploader.js"
 import Producto from "../models/producto.js"
 
 export const prueba= (req, res) => {
@@ -7,9 +8,22 @@ export const prueba= (req, res) => {
 
 export const crearProducto= async(req, res) => {
     try {
-        const productoNuevo = new Producto(req.body)
+        let imagenUrl= '';
+        if (req.file){
+            const resultado = await subirImagenCloudinary(req.file.buffer)
+            console.log(resultado);
+            imagenUrl = resultado.secure_url;
+        }else{
+            imagenUrl = 'https://static.vecteezy.com/system/resources/thumbnails/005/720/408/small_2x/crossed-image-icon-picture-not-available-delete-picture-symbol-free-vector.jpg'            
+        }
+
+        const productoNuevo = new Producto({
+            ...req.body,
+            imagen: imagenUrl
+        })
+
         await productoNuevo.save()
-        res.status(201).json({mensaje:"Producto creado con exito"});
+        res.status(201).json({mensaje:"Producto creado con exito", producto: productoNuevo});
     } catch (error) {
         console.error(error)
         res.status(500).json({mensaje:"Error al crear el producto"})
@@ -65,11 +79,23 @@ export const borrarProductoPorId = async (req, res) => {
 
 export const editarProductoPorId = async (req, res) => {
     try {
-        const productoEditado = await Producto.findByIdAndUpdate(req.params.id, req.body)
-       if(!productoEditado){
-            return res.status(404).json({mensaje:"El producto no existe."})
+        const productoBuscado = await Producto.findById(req.params.id)
+        if(!productoBuscado){
+            return res.status(404).json({mensaje:"El producto no encontrado."});
         }
-        res.status(200).json({mensaje:"Producto editado con exito."})
+        let imagenUrl = productoBuscado.imagen;
+
+        if (req.file){
+            const resultado = await subirImagenCloudinary(req.file.buffer);
+            imagenUrl = resultado.secure_url;
+        }
+
+        const productoEditado = await Producto.findByIdAndUpdate(req.params.id,
+            {
+            ...req.body,
+            imagen: imagenUrl,
+        });
+        res.status(200).json({mensaje:"Producto editado con éxito.", producto: productoEditado})
         } catch (error) {
         console.error(error);
         res.status(500).json({mensaje:"Error al editar el producto por el Id."})

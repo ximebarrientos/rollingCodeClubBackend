@@ -76,13 +76,6 @@ const validacionProducto = [
     .isLength({ min: 10, max: 500 })
     .withMessage("La descripción debe tener entre 10 y 500 caracteres."),
 
-  body("imagen")
-    .notEmpty()
-    .withMessage("La imagen es obligatoria.")
-    .isURL()
-    .withMessage("La imagen debe ser una URL válida.")
-    .matches(/\.(jpg|jpeg|png|webp)$/),
-
   body("talles")
     .optional()
     .custom((valor, { req }) => {
