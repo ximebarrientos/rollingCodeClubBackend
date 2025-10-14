@@ -18,7 +18,7 @@ router.route("/login").post(login);
 
 router
   .route("/")
-  .post([verificarToken,validarUsuario], registrarUsuario)
+  .post(validarUsuario, registrarUsuario)
   .get(obtenerUsuarios);
 
 router
