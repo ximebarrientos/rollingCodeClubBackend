@@ -97,11 +97,19 @@ const validarUsuario = [
     }),
 
   body("password")
-    .optional()
+    .custom((value, { req }) => {
+      if (req.method === "PUT" && !value) {
+        return true;
+      }
+
+      if (!value) {
+        throw new Error("La contraseña es obligatoria.");
+      }
+
+      return true;
+    })
     .isLength({ min: 8 })
     .withMessage("La contraseña debe tener al menos 8 caracteres."),
-
-  (req, res, next) => resultadoValidacion(req, res, next),
 ];
 
 export default validarUsuario;
