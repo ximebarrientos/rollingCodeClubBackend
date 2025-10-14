@@ -19,7 +19,7 @@ router.route("/login").post(login);
 router
   .route("/")
   .post([verificarToken,validarUsuario], registrarUsuario)
-  .get(verificarToken, obtenerUsuarios);
+  .get(obtenerUsuarios);
 
 router
   .route("/:id")

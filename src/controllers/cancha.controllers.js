@@ -1,9 +1,5 @@
 import Cancha from "../models/cancha.js";
 
-export const prueba = (req, res) => {
-  res.status(200);
-  res.send("Mensaje desde el controlador de canchas");
-};
 
 export const crearCancha = async (req, res) => {
   try {
