@@ -25,7 +25,7 @@ router
 router
   .route("/:id")
   .get(validarIdProducto, obtenerProductoPorId)
-  .delete(validarIdProducto, borrarProductoPorId)
-  .put([validarIdProducto, upload.single('imagen'), errorMulter, validacionProducto], editarProductoPorId);
+  .delete([verificarToken,validarIdProducto], borrarProductoPorId)
+  .put([verificarToken,validarIdProducto, upload.single('imagen'), errorMulter, validacionProducto], editarProductoPorId);
 
 export default router;

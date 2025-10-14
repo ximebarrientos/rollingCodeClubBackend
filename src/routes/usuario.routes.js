@@ -18,13 +18,13 @@ router.route("/login").post(login);
 
 router
   .route("/")
-  .post(validarUsuario, registrarUsuario)
+  .post([verificarToken,validarUsuario], registrarUsuario)
   .get(verificarToken, obtenerUsuarios);
 
 router
   .route("/:id")
   .get(validarIdUsuario, obtenerUsuarioPorId)
-  .delete(validarIdUsuario, verificarToken, borrarUsuarioPorId)
-  .put(validarIdUsuario, verificarToken, validarUsuario, editarUsuarioPorId);
+  .delete([verificarToken,validarIdUsuario], borrarUsuarioPorId)
+  .put([verificarToken,validarIdUsuario, validarUsuario], editarUsuarioPorId);
 
 export default router;
