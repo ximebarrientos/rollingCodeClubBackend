@@ -1,11 +1,42 @@
+import subirImagenCloudinary from "../helpers/cloudinaryUploader.js";
 import Cancha from "../models/cancha.js";
-
 
 export const crearCancha = async (req, res) => {
   try {
-    const canchaNueva = new Cancha(req.body);
+    let imagenUrl = "";
+
+    const archivoImagen = req.files?.find(
+      (f) => f.fieldname === "imagen" || f.fieldname === "imagenCancha"
+    );
+
+    if (archivoImagen) {
+      const resultado = await subirImagenCloudinary(archivoImagen.buffer);
+      imagenUrl = resultado.secure_url;
+    } else {
+      imagenUrl =
+        "https://static.vecteezy.com/system/resources/thumbnails/005/720/408/small_2x/crossed-image-icon-picture-not-available-delete-picture-symbol-free-vector.jpg";
+    }
+
+    const bodyNormalizado = { ...req.body };
+    if (
+      bodyNormalizado.horariosCancha &&
+      typeof bodyNormalizado.horariosCancha === "string"
+    ) {
+      bodyNormalizado.horariosCancha = bodyNormalizado.horariosCancha
+        .split(",")
+        .map((h) => h.trim());
+    }
+
+    const canchaNueva = new Cancha({
+      ...bodyNormalizado,
+      imagenCancha: imagenUrl,
+    });
+
     await canchaNueva.save();
-    res.status(201).json({ mensaje: "Cancha creada con exito" });
+    res.status(201).json({
+      mensaje: "Cancha creada con éxito",
+      cancha: canchaNueva,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ mensaje: "Error al crear la cancha" });
@@ -43,7 +74,7 @@ export const borrarCanchaPorID = async (req, res) => {
         .status(404)
         .json({ mensaje: "Cancha no encontrada para eliminar" });
     }
-    res.status(200).json({ mensaje: "Cancha eliminada con exito" });
+    res.status(200).json({ mensaje: "Cancha eliminada con éxito" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ mensaje: "Error al eliminar la cancha" });
@@ -51,14 +82,50 @@ export const borrarCanchaPorID = async (req, res) => {
 };
 
 export const editarCanchaPorID = async (req, res) => {
-    try {
-        const canchaEditada = await Cancha.findByIdAndUpdate(req.params.id, req.body)
-        if(!canchaEditada){
-            return res.status(404).json({mensaje: "Cancha no encontrada para editar"})
-        }
-        res.status(200).json({mensaje: "Cancha editada con exito"})
-    } catch (error) {
-        console.error(error)
-        res.status(500).json({mensaje: "Error al editar la cancha por ID"})
+  try {
+    const canchaBuscada = await Cancha.findById(req.params.id);
+    if (!canchaBuscada) {
+      return res
+        .status(404)
+        .json({ mensaje: "Cancha no encontrada para editar" });
     }
-}
+
+    let imagenUrl = canchaBuscada.imagenCancha;
+
+    const archivoImagen = req.files?.find(
+      (f) => f.fieldname === "imagen" || f.fieldname === "imagenCancha"
+    );
+
+    if (archivoImagen) {
+      const resultado = await subirImagenCloudinary(archivoImagen.buffer);
+      imagenUrl = resultado.secure_url;
+    }
+
+    const bodyNormalizado = { ...req.body };
+    if (
+      bodyNormalizado.horariosCancha &&
+      typeof bodyNormalizado.horariosCancha === "string"
+    ) {
+      bodyNormalizado.horariosCancha = bodyNormalizado.horariosCancha
+        .split(",")
+        .map((h) => h.trim());
+    }
+
+    const canchaEditada = await Cancha.findByIdAndUpdate(
+      req.params.id,
+      {
+        ...bodyNormalizado,
+        imagenCancha: imagenUrl,
+      },
+      { new: true }
+    );
+
+    res.status(200).json({
+      mensaje: "Cancha editada con éxito",
+      cancha: canchaEditada,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: "Error al editar la cancha por ID" });
+  }
+};

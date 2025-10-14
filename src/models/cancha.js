@@ -41,10 +41,17 @@ const canchaSchema = new Schema({
     minLength: 5,
     maxLength: 250
   },
-  imagenCancha: {
+    imagenCancha: {
     type: String,
-    required: true
-  },
+    required: true,
+    validate: {
+      validator: (valor) => {
+        return /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?(\.(jpg|jpeg|png|webp))$/.test(
+          valor
+        );
+      },
+    },
+  }
   
 }, { timestamps: true });
 
