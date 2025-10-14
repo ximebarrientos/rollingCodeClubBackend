@@ -19,13 +19,13 @@ router.route("/prueba").get(prueba);
 
 router
 .route("/")
-.post([verificarToken,upload.single('imagen'), errorMulter, validacionProducto], crearProducto)
+.post([verificarToken,upload, errorMulter, validacionProducto], crearProducto)
 .get(obtenerProductos);
 
 router
   .route("/:id")
   .get(validarIdProducto, obtenerProductoPorId)
   .delete([verificarToken,validarIdProducto], borrarProductoPorId)
-  .put([verificarToken,validarIdProducto, upload.single('imagen'), errorMulter, validacionProducto], editarProductoPorId);
+  .put([verificarToken,validarIdProducto, upload, errorMulter, validacionProducto], editarProductoPorId);
 
 export default router;

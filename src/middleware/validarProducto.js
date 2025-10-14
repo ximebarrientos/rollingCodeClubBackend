@@ -8,19 +8,12 @@ const validacionProducto = [
     .withMessage("El nombre del producto es obligatorio.")
     .isLength({ min: 3, max: 100 })
     .withMessage("El nombre del producto debe tener entre 3 y 100 caracteres.")
-    .custom(async (valor, {req}) => {
-      const productoExistente = await Producto.findOne({
-        nombreProducto: valor,
-      });
-      if (!productoExistente) {
+    .custom(async (valor, { req }) => {
+      const productoExistente = await Producto.findOne({ nombreProducto: valor });
+      if (!productoExistente) return true;
+      if (req.params.id && req.params.id === productoExistente._id.toString())
         return true;
-      }
-      if (req.params.id && req.params.id === productoExistente._id.toString()) {
-        return true;
-      }
-      throw new Error(
-          "Ya existe un producto con este nombre."
-        );
+      throw new Error("Ya existe un producto con este nombre.");
     }),
 
   body("precio")
@@ -29,43 +22,27 @@ const validacionProducto = [
     .isNumeric()
     .withMessage("El precio debe ser un número.")
     .custom((valor) => {
-      if (valor >= 50 || valor <= 1000000) {
-        return true;
-      } else {
-        throw new Error("El precio debe estar entre 50 y 1.000.000");
-      }
+      if (valor >= 50 && valor <= 1000000) return true;
+      throw new Error("El precio debe estar entre 50 y 1.000.000");
     }),
 
   body("categoria")
     .notEmpty()
     .withMessage("La categoría es obligatoria.")
     .isIn(["Indumentaria", "Accesorios"])
-    .withMessage(
-      "La categoría no es válida. Debe ser 'Indumentaria' o 'Accesorios'."
-    ),
+    .withMessage("La categoría debe ser 'Indumentaria' o 'Accesorios'."),
 
   body("subcategoria").custom((valor, { req }) => {
     const categoria = req.body.categoria;
+    const subIndumentaria = ["Botines", "Camisetas", "Shorts"];
+    const subAccesorios = ["Kits de entrenamiento", "Pelotas"];
 
-    const subcategoriasIndumentaria = ["Botines", "Camisetas", "Shorts"];
-    const subcategoriasAccesorios = ["Kits de entrenamiento", "Pelotas"];
-
-    if (
-      categoria === "Indumentaria" &&
-      !subcategoriasIndumentaria.includes(valor)
-    ) {
-      throw new Error(
-        "La subcategoría elegida no corresponde a Indumentaria. Use Botines, Camisetas o Shorts."
-      );
+    if (categoria === "Indumentaria" && !subIndumentaria.includes(valor)) {
+      throw new Error("Subcategoría inválida para Indumentaria (usa Botines, Camisetas o Shorts).");
     }
 
-    if (
-      categoria === "Accesorios" &&
-      !subcategoriasAccesorios.includes(valor)
-    ) {
-      throw new Error(
-        "La subcategoría elegida no corresponde a Accesorios. Use Kits de entrenamiento o Pelotas."
-      );
+    if (categoria === "Accesorios" && !subAccesorios.includes(valor)) {
+      throw new Error("Subcategoría inválida para Accesorios (usa Kits de entrenamiento o Pelotas).");
     }
     return true;
   }),
@@ -80,16 +57,16 @@ const validacionProducto = [
     .optional()
     .custom((valor, { req }) => {
       const subcategoria = req.body.subcategoria;
+
+      if (typeof valor === "string") {
+        valor = valor.split(",").map((t) => t.trim());
+      }
+
       if (["Camisetas", "Shorts"].includes(subcategoria)) {
-        if (!Array.isArray(valor)) {
-          throw new Error("Los talles deben ser un arreglo (array).");
+        if (!Array.isArray(valor) || valor.length === 0) {
+          throw new Error("Este producto debe incluir al menos un talle disponible.");
         }
-        if (valor.length === 0) {
-          throw new Error(
-            "Este producto debe incluir al menos un talle disponible."
-          );
-        }
-      } else if (valor && valor.length > 0) {
+      } else if (Array.isArray(valor) && valor.length > 0) {
         throw new Error("No se deben incluir talles en esta subcategoría.");
       }
       return true;
@@ -99,22 +76,21 @@ const validacionProducto = [
     .optional()
     .custom((valor, { req }) => {
       const subcategoria = req.body.subcategoria;
+
+      if (typeof valor === "string") {
+        valor = valor.split(",").map((n) => n.trim());
+      }
+
       if (subcategoria === "Botines") {
-        if (!Array.isArray(valor)) {
-          throw new Error("Los números deben ser un arreglo (array).");
+        if (!Array.isArray(valor) || valor.length === 0) {
+          throw new Error("Los Botines deben incluir al menos un número disponible.");
         }
-        if (valor.length === 0) {
-          throw new Error(
-            "Este producto debe incluir al menos un número disponible."
-          );
-        }
-      } else if (valor && valor.length > 0) {
+      } else if (Array.isArray(valor) && valor.length > 0) {
         throw new Error("No se deben incluir números en esta subcategoría.");
       }
       return true;
     }),
 
-  // Validación global para asegurar que talles o números estén presentes cuando corresponde
   body().custom((_, { req }) => {
     const { categoria, subcategoria, talles, numeros } = req.body;
 
@@ -123,15 +99,11 @@ const validacionProducto = [
         ["Camisetas", "Shorts"].includes(subcategoria) &&
         (!talles || talles.length === 0)
       ) {
-        throw new Error(
-          "Los productos de Camisetas o Shorts deben incluir al menos un talle."
-        );
+        throw new Error("Los productos de Camisetas o Shorts deben incluir al menos un talle.");
       }
 
       if (subcategoria === "Botines" && (!numeros || numeros.length === 0)) {
-        throw new Error(
-          "Los Botines deben incluir al menos un número disponible."
-        );
+        throw new Error("Los Botines deben incluir al menos un número disponible.");
       }
     }
 
