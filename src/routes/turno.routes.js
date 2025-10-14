@@ -6,16 +6,18 @@ import {
   obtenerTurnos,
 } from "../controllers/turno.controllers.js";
 import validacionTurno from "../middleware/validarTurno.js";
+import verificarToken from "../middleware/verificarToken.js";
+import validarIdTurno from "../middleware/validarIdTurno.js";
 
 const router = Router();
 
 router
   .route("/")
-  .post(validacionTurno, crearTurno)
+  .post([verificarToken,validacionTurno], crearTurno)
   .get(obtenerTurnos);
 router
   .route("/:id")
-  .get(obtenerTurnoPorId)
-  .delete(borrarTurnoPorID);
+  .get(validarIdTurno,obtenerTurnoPorId)
+  .delete([verificarToken,validarIdTurno],borrarTurnoPorID);
 
 export default router;

@@ -12,7 +12,7 @@ const verificarToken = (req, res, next) => {
     const tokenLimpio = token.replace("Bearer ", "");
     const payload = jwt.verify(
       tokenLimpio,
-      process.env.JWT_SECRET || "RoLlInGcOdE$Jm1tPq8y*!xZcWvB4"
+      process.env.JWT_SECRET
     );
 
     req.usuario = payload;

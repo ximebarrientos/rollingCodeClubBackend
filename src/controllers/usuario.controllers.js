@@ -115,11 +115,9 @@ export const login = async (req, res) => {
 
     const usuarioEncontrado = await Usuario.findOne({ correoElectronico });
     if (!usuarioEncontrado) {
-      return res
-        .status(400)
-        .json({
-          mensaje: "Credenciales inválidas (email o contraseña incorrectos).",
-        });
+      return res.status(400).json({
+        mensaje: "Credenciales inválidas (email o contraseña incorrectos).",
+      });
     }
 
     const passwordValida = await bcrypt.compare(
@@ -127,11 +125,9 @@ export const login = async (req, res) => {
       usuarioEncontrado.password
     );
     if (!passwordValida) {
-      return res
-        .status(400)
-        .json({
-          mensaje: "Credenciales inválidas (email o contraseña incorrectos).",
-        });
+      return res.status(400).json({
+        mensaje: "Credenciales inválidas (email o contraseña incorrectos).",
+      });
     }
 
     const token = jwt.sign(
@@ -139,7 +135,7 @@ export const login = async (req, res) => {
         id: usuarioEncontrado._id,
         rol: usuarioEncontrado.rol,
       },
-      process.env.JWT_SECRET || "RoLlInGcOdE$Jm1tPq8y*!xZcWvB4",
+      process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
 
