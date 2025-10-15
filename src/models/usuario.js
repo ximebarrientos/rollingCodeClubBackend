@@ -81,6 +81,13 @@ const usuarioSchema = new Schema({
     enum: ["usuario", "administrador"],
     default: "usuario",
   },
+
+  estado: {
+    type: String,
+    required: true,
+    enum: ["activo", "bloqueado"],
+    default: "activo",
+  },
   fechaRegistro: {
     type: Date,
     default: Date.now,
