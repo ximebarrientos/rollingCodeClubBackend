@@ -6,6 +6,7 @@ import {
   obtenerProductoPorId,
   borrarProductoPorId,
   editarProductoPorId,
+  productosPaginados
 } from "../controllers/producto.controllers.js";
 import validacionProducto from "../middleware/validarProducto.js";
 import validarIdProducto from "../middleware/validarIdProducto.js";
@@ -21,6 +22,10 @@ router
 .route("/")
 .post([verificarToken,upload, errorMulter, validacionProducto], crearProducto)
 .get(obtenerProductos);
+
+router
+.route("/paginacion")
+.get(productosPaginados)
 
 router
   .route("/:id")
