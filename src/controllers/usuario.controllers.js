@@ -97,39 +97,74 @@ export const editarUsuarioPorId = async (req, res) => {
 
 export const borrarUsuarioPorId = async (req, res) => {
   try {
-    const usuarioBorrado = await Usuario.findByIdAndDelete(req.params.id);
+    const idUsuario = req.params.id;
+
+    const usuarioBorrado = await Usuario.findByIdAndDelete(idUsuario);
 
     if (!usuarioBorrado) {
-      return res.status(404).json({ mensaje: "El usuario no existe." });
+      return res.status(404).json({
+        mensaje: "Usuario no encontrado para borrar.",
+      });
     }
-    res.status(200).json({ mensaje: "Usuario borrado con éxito." });
+
+    res.status(200).json({
+      mensaje: `Usuario ${usuarioBorrado.nombreUsuario} eliminado correctamente.`,
+      usuario: usuarioBorrado,
+    });
   } catch (error) {
-    console.error("Error al borrar usuario:", error);
-    res.status(500).json({ mensaje: "Error al borrar el usuario por el Id." });
+    console.error("Error al intentar borrar el usuario:", error);
+    res.status(500).json({
+      mensaje:
+        "Error interno del servidor al procesar la solicitud de borrado.",
+    });
   }
 };
 
+export const alternarEstadoUsuario = async (req, res) => {
+  try {
+    const idUsuario = req.params.id;
+
+    const { estado: nuevoEstado } = req.body;
+
+    if (
+      !nuevoEstado ||
+      (nuevoEstado !== "activo" && nuevoEstado !== "bloqueado")
+    ) {
+      return res.status(400).json({
+        mensaje:
+          'El nuevo estado es inválido. Debe ser "activo" o "bloqueado".',
+      });
+    }
+
+    const usuarioActualizado = await Usuario.findByIdAndUpdate(
+      idUsuario,
+      { estado: nuevoEstado },
+      { new: true }
+    );
+
+    if (!usuarioActualizado) {
+      return res.status(404).json({
+        mensaje: "Usuario no encontrado.",
+      });
+    }
+
+    res.status(200).json({
+      mensaje: `El estado del usuario ${usuarioActualizado.nombreUsuario} fue actualizado a ${nuevoEstado}.`,
+      usuario: usuarioActualizado,
+    });
+  } catch (error) {
+    console.error("Error al intentar alternar el estado del usuario:", error);
+    res.status(500).json({
+      mensaje:
+        "Error interno del servidor al procesar la solicitud de cambio de estado.",
+    });
+  }
+};
 export const login = async (req, res) => {
   try {
     const { correoElectronico, password } = req.body;
 
     const usuarioEncontrado = await Usuario.findOne({ correoElectronico });
-    if (!usuarioEncontrado) {
-      return res.status(400).json({
-        mensaje: "Credenciales inválidas (email o contraseña incorrectos).",
-      });
-    }
-
-    const passwordValida = await bcrypt.compare(
-      password,
-      usuarioEncontrado.password
-    );
-    if (!passwordValida) {
-      return res.status(400).json({
-        mensaje: "Credenciales inválidas (email o contraseña incorrectos).",
-      });
-    }
-
     const token = jwt.sign(
       {
         id: usuarioEncontrado._id,
@@ -145,6 +180,13 @@ export const login = async (req, res) => {
         id: usuarioEncontrado._id,
         nombreUsuario: usuarioEncontrado.nombreUsuario,
         rol: usuarioEncontrado.rol,
+
+        nombre: usuarioEncontrado.nombre,
+        apellido: usuarioEncontrado.apellido,
+        fechaNacimiento: usuarioEncontrado.fechaNacimiento,
+        genero: usuarioEncontrado.genero,
+        celular: usuarioEncontrado.celular,
+        correoElectronico: usuarioEncontrado.correoElectronico,
       },
       token,
     });
