@@ -26,6 +26,7 @@ router
 router
   .route("/:id")
   .get(validarIdUsuario, obtenerUsuarioPorId)
+  .put([verificarToken, validarIdUsuario], editarUsuarioPorId)
   .delete([verificarToken, validarAdmin, validarIdUsuario], borrarUsuarioPorId);
 
 router

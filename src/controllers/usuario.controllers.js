@@ -165,22 +165,6 @@ export const login = async (req, res) => {
     const { correoElectronico, password } = req.body;
 
     const usuarioEncontrado = await Usuario.findOne({ correoElectronico });
-    if (!usuarioEncontrado) {
-      return res.status(400).json({
-        mensaje: "Credenciales inválidas (email o contraseña incorrectos).",
-      });
-    }
-
-    const passwordValida = await bcrypt.compare(
-      password,
-      usuarioEncontrado.password
-    );
-    if (!passwordValida) {
-      return res.status(400).json({
-        mensaje: "Credenciales inválidas (email o contraseña incorrectos).",
-      });
-    }
-
     const token = jwt.sign(
       {
         id: usuarioEncontrado._id,
@@ -196,6 +180,13 @@ export const login = async (req, res) => {
         id: usuarioEncontrado._id,
         nombreUsuario: usuarioEncontrado.nombreUsuario,
         rol: usuarioEncontrado.rol,
+
+        nombre: usuarioEncontrado.nombre,
+        apellido: usuarioEncontrado.apellido,
+        fechaNacimiento: usuarioEncontrado.fechaNacimiento,
+        genero: usuarioEncontrado.genero,
+        celular: usuarioEncontrado.celular,
+        correoElectronico: usuarioEncontrado.correoElectronico,
       },
       token,
     });
