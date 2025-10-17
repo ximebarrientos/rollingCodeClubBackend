@@ -99,13 +99,21 @@ export const borrarUsuarioPorId = async (req, res) => {
   try {
     const idUsuario = req.params.id;
 
-    const usuarioBorrado = await Usuario.findByIdAndDelete(idUsuario);
+    const usuarioAEliminar = await Usuario.findById(idUsuario);
 
-    if (!usuarioBorrado) {
+    if (!usuarioAEliminar) {
       return res.status(404).json({
         mensaje: "Usuario no encontrado para borrar.",
       });
     }
+
+    if (usuarioAEliminar.rol === "administrador") {
+      return res.status(403).json({
+        mensaje: "Acción prohibida: No se puede eliminar a otro administrador.",
+      });
+    }
+
+    const usuarioBorrado = await Usuario.findByIdAndDelete(idUsuario);
 
     res.status(200).json({
       mensaje: `Usuario ${usuarioBorrado.nombreUsuario} eliminado correctamente.`,
@@ -123,8 +131,22 @@ export const borrarUsuarioPorId = async (req, res) => {
 export const alternarEstadoUsuario = async (req, res) => {
   try {
     const idUsuario = req.params.id;
-
     const { estado: nuevoEstado } = req.body;
+
+    const usuarioAEditar = await Usuario.findById(idUsuario);
+
+    if (!usuarioAEditar) {
+      return res.status(404).json({
+        mensaje: "Usuario no encontrado.",
+      });
+    }
+
+    if (usuarioAEditar.rol === "administrador") {
+      return res.status(403).json({
+        mensaje:
+          "Acción prohibida: No se puede cambiar el estado de otro administrador.",
+      });
+    }
 
     if (
       !nuevoEstado ||
@@ -141,12 +163,6 @@ export const alternarEstadoUsuario = async (req, res) => {
       { estado: nuevoEstado },
       { new: true }
     );
-
-    if (!usuarioActualizado) {
-      return res.status(404).json({
-        mensaje: "Usuario no encontrado.",
-      });
-    }
 
     res.status(200).json({
       mensaje: `El estado del usuario ${usuarioActualizado.nombreUsuario} fue actualizado a ${nuevoEstado}.`,
