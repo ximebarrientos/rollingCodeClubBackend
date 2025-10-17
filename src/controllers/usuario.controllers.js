@@ -69,14 +69,43 @@ export const obtenerUsuarioPorId = async (req, res) => {
 export const editarUsuarioPorId = async (req, res) => {
   try {
     const { password, ...datosAActualizar } = req.body;
+    const idUsuario = req.params.id; 
 
+    
+    const { correoElectronico, celular } = datosAActualizar;
+
+    if (correoElectronico || celular) {
+      const usuarioDuplicado = await Usuario.findOne({
+        $or: [
+          { correoElectronico: correoElectronico },
+          { celular: celular },
+        ],
+        _id: { $ne: idUsuario } 
+      });
+
+      if (usuarioDuplicado) {
+        let mensajeError = "Error al editar el perfil. ";
+        if (usuarioDuplicado.correoElectronico === correoElectronico) {
+          mensajeError = "El correo electrónico ya está en uso por otra cuenta.";
+        } else if (usuarioDuplicado.celular === celular) {
+          mensajeError = "El número de celular ya está en uso por otra cuenta.";
+        }
+        
+        
+        return res.status(400).json({
+          mensaje: mensajeError,
+        });
+      }
+    }
+ 
     if (password) {
       const salt = await bcrypt.genSalt(10);
       datosAActualizar.password = await bcrypt.hash(password, salt);
     }
 
+    
     const usuarioEditado = await Usuario.findByIdAndUpdate(
-      req.params.id,
+      idUsuario, 
       datosAActualizar,
       { new: true, runValidators: true }
     ).select("-password");
@@ -91,7 +120,8 @@ export const editarUsuarioPorId = async (req, res) => {
     });
   } catch (error) {
     console.error("Error al editar usuario:", error);
-    res.status(500).json({ mensaje: "Error al editar el usuario por el Id." });
+    
+    res.status(500).json({ mensaje: "Error interno del servidor." });
   }
 };
 
