@@ -69,43 +69,47 @@ export const obtenerUsuarioPorId = async (req, res) => {
 export const editarUsuarioPorId = async (req, res) => {
   try {
     const { password, ...datosAActualizar } = req.body;
-    const idUsuario = req.params.id; 
+    const idUsuario = req.params.id;
 
-    
-    const { correoElectronico, celular } = datosAActualizar;
+    const { correoElectronico, celular, nombreUsuario } = datosAActualizar;
 
-    if (correoElectronico || celular) {
+    if (correoElectronico || celular || nombreUsuario) {
       const usuarioDuplicado = await Usuario.findOne({
         $or: [
           { correoElectronico: correoElectronico },
           { celular: celular },
+          { nombreUsuario: nombreUsuario },
         ],
-        _id: { $ne: idUsuario } 
+
+        _id: { $ne: idUsuario },
       });
 
       if (usuarioDuplicado) {
         let mensajeError = "Error al editar el perfil. ";
+
         if (usuarioDuplicado.correoElectronico === correoElectronico) {
-          mensajeError = "El correo electrónico ya está en uso por otra cuenta.";
+          mensajeError =
+            "El correo electrónico ya está en uso por otra cuenta.";
         } else if (usuarioDuplicado.celular === celular) {
           mensajeError = "El número de celular ya está en uso por otra cuenta.";
+        } else if (usuarioDuplicado.nombreUsuario === nombreUsuario) {
+          mensajeError =
+            "El nombre de usuario ya está en uso. Por favor, elige otro.";
         }
-        
-        
+
         return res.status(400).json({
           mensaje: mensajeError,
         });
       }
     }
- 
+
     if (password) {
       const salt = await bcrypt.genSalt(10);
       datosAActualizar.password = await bcrypt.hash(password, salt);
     }
 
-    
     const usuarioEditado = await Usuario.findByIdAndUpdate(
-      idUsuario, 
+      idUsuario,
       datosAActualizar,
       { new: true, runValidators: true }
     ).select("-password");
@@ -120,7 +124,7 @@ export const editarUsuarioPorId = async (req, res) => {
     });
   } catch (error) {
     console.error("Error al editar usuario:", error);
-    
+
     res.status(500).json({ mensaje: "Error interno del servidor." });
   }
 };
