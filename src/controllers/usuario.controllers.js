@@ -69,6 +69,39 @@ export const obtenerUsuarioPorId = async (req, res) => {
 export const editarUsuarioPorId = async (req, res) => {
   try {
     const { password, ...datosAActualizar } = req.body;
+    const idUsuario = req.params.id;
+
+    const { correoElectronico, celular, nombreUsuario } = datosAActualizar;
+
+    if (correoElectronico || celular || nombreUsuario) {
+      const usuarioDuplicado = await Usuario.findOne({
+        $or: [
+          { correoElectronico: correoElectronico },
+          { celular: celular },
+          { nombreUsuario: nombreUsuario },
+        ],
+
+        _id: { $ne: idUsuario },
+      });
+
+      if (usuarioDuplicado) {
+        let mensajeError = "Error al editar el perfil. ";
+
+        if (usuarioDuplicado.correoElectronico === correoElectronico) {
+          mensajeError =
+            "El correo electrónico ya está en uso por otra cuenta.";
+        } else if (usuarioDuplicado.celular === celular) {
+          mensajeError = "El número de celular ya está en uso por otra cuenta.";
+        } else if (usuarioDuplicado.nombreUsuario === nombreUsuario) {
+          mensajeError =
+            "El nombre de usuario ya está en uso. Por favor, elige otro.";
+        }
+
+        return res.status(400).json({
+          mensaje: mensajeError,
+        });
+      }
+    }
 
     if (password) {
       const salt = await bcrypt.genSalt(10);
@@ -76,7 +109,7 @@ export const editarUsuarioPorId = async (req, res) => {
     }
 
     const usuarioEditado = await Usuario.findByIdAndUpdate(
-      req.params.id,
+      idUsuario,
       datosAActualizar,
       { new: true, runValidators: true }
     ).select("-password");
@@ -91,7 +124,8 @@ export const editarUsuarioPorId = async (req, res) => {
     });
   } catch (error) {
     console.error("Error al editar usuario:", error);
-    res.status(500).json({ mensaje: "Error al editar el usuario por el Id." });
+
+    res.status(500).json({ mensaje: "Error interno del servidor." });
   }
 };
 
@@ -99,13 +133,21 @@ export const borrarUsuarioPorId = async (req, res) => {
   try {
     const idUsuario = req.params.id;
 
-    const usuarioBorrado = await Usuario.findByIdAndDelete(idUsuario);
+    const usuarioAEliminar = await Usuario.findById(idUsuario);
 
-    if (!usuarioBorrado) {
+    if (!usuarioAEliminar) {
       return res.status(404).json({
         mensaje: "Usuario no encontrado para borrar.",
       });
     }
+
+    if (usuarioAEliminar.rol === "administrador") {
+      return res.status(403).json({
+        mensaje: "Acción prohibida: No se puede eliminar a otro administrador.",
+      });
+    }
+
+    const usuarioBorrado = await Usuario.findByIdAndDelete(idUsuario);
 
     res.status(200).json({
       mensaje: `Usuario ${usuarioBorrado.nombreUsuario} eliminado correctamente.`,
@@ -123,8 +165,22 @@ export const borrarUsuarioPorId = async (req, res) => {
 export const alternarEstadoUsuario = async (req, res) => {
   try {
     const idUsuario = req.params.id;
-
     const { estado: nuevoEstado } = req.body;
+
+    const usuarioAEditar = await Usuario.findById(idUsuario);
+
+    if (!usuarioAEditar) {
+      return res.status(404).json({
+        mensaje: "Usuario no encontrado.",
+      });
+    }
+
+    if (usuarioAEditar.rol === "administrador") {
+      return res.status(403).json({
+        mensaje:
+          "Acción prohibida: No se puede cambiar el estado de otro administrador.",
+      });
+    }
 
     if (
       !nuevoEstado ||
@@ -141,12 +197,6 @@ export const alternarEstadoUsuario = async (req, res) => {
       { estado: nuevoEstado },
       { new: true }
     );
-
-    if (!usuarioActualizado) {
-      return res.status(404).json({
-        mensaje: "Usuario no encontrado.",
-      });
-    }
 
     res.status(200).json({
       mensaje: `El estado del usuario ${usuarioActualizado.nombreUsuario} fue actualizado a ${nuevoEstado}.`,
