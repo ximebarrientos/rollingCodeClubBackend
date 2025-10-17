@@ -2,9 +2,10 @@
 
 Un backend desarrollado con Node.js y Express para una plataforma que combina el alquiler de canchas de fútbol con un e-commerce de productos relacionados al deporte, incluyendo gestión de roles de usuario.
 
-
 ## ✨ Descripción
+
 Esta API proporciona servicios para:
+
 - Gestión de usuarios con autenticación JWT
 - Alquiler y administración de canchas de fútbol
 - Sistema de reservas de turnos
@@ -12,6 +13,7 @@ Esta API proporciona servicios para:
 - Control de roles de usuario
 
 ## 🚀 Tecnologías Utilizadas
+
 - **Node.js** - Entorno de ejecución de JavaScript
 - **Express.js** - Framework web para Node.js
 - **MongoDB** - Base de datos NoSQL
@@ -25,6 +27,7 @@ Esta API proporciona servicios para:
 - **Morgan** - Logging de peticiones HTTP
 
 ## 🏗️ Estructura del Proyecto
+
 ```
 rollingCodeClubBackend/
 ├── db/
@@ -67,23 +70,28 @@ rollingCodeClubBackend/
 ## 💻Instalación y Configuración
 
 ### Prerrequisitos
+
 - Node.js v14 o superior
 - MongoDB Atlas o instancia local de MongoDB
 - Cuenta en Cloudinary (para almacenamiento de imágenes)
 
 ### Instalación
+
 1. Clona el repositorio:
+
    ```bash
    git clone https://github.com/ximebarrientos/rollingCodeClubBackend.git
    cd rollingCodeClubBackend
    ```
 
 2. Instala las dependencias:
+
    ```bash
    npm install
    ```
 
 3. Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
+
    ```
    PORT=3000
    MONGODB=tu_cadena_de_conexion_mongodb
@@ -91,14 +99,17 @@ rollingCodeClubBackend/
    CLOUD_NAME=tu_cloud_name_de_cloudinary
    API_KEY=tu_api_key_de_cloudinary
    API_SECRET=tu_api_secret_de_cloudinary
+   MERCADOPAGO_ACCESS_TOKEN=your_mp_access_token_heretu_token_secreto_de_mp
    ```
 
 4. Inicia el servidor en modo desarrollo:
+
    ```bash
    npm run dev
    ```
 
    O en modo producción:
+
    ```bash
    npm start
    ```
@@ -106,9 +117,14 @@ rollingCodeClubBackend/
 El servidor iniciará en `http://localhost:3000` por defecto.
 
 ## Endpoints de la API
+
 [Mira la documentación aqui] AQUI IRIA EL LINK DE LA DOCUMENTACION DE POSTMAN
 
+## Link del repositorio del Frontend
+- https://github.com/ximebarrientos/rollingCodeClub
+
 ## 👓 Autores
-- Claudia Ximena Barrientos
-- Alessandra Borges Licciardi
-- Jose David Baza
+
+- **Claudia Ximena Barrientos** [https://github.com/ximebarrientos]
+- **Alessandra Borges Licciardi** [https://github.com/Aleblok]
+- **Jose David Baza** [https://github.com/JoseBaza91]
