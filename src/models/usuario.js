@@ -63,7 +63,9 @@ const usuarioSchema = new Schema({
     lowercase: true,
     validate: {
       validator: (valor) => {
-        return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(valor);
+        return /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(
+          valor
+        );
       },
       message: "El formato del correo electrónico no es válido.",
     },
@@ -74,6 +76,13 @@ const usuarioSchema = new Schema({
     required: true,
     minLength: 8,
     maxLength: 150,
+    validate: {
+      validator: (valor) => {
+        return /^(?=.*\d)(?=.*[\u0021-\u002b\u003c-\u0040])(?=.*[A-Z])(?=.*[a-z])\S{8,100}$/.test(
+          valor
+        );
+      },
+    },
   },
 
   rol: {

@@ -108,8 +108,12 @@ const validarUsuario = [
 
       return true;
     })
-    .isLength({ min: 8 })
-    .withMessage("La contraseña debe tener al menos 8 caracteres."),
+    .matches(
+      /^(?=.*\d)(?=.*[\u0021-\u002b\u003c-\u0040])(?=.*[A-Z])(?=.*[a-z])\S{8,16}$/
+    )
+    .withMessage(
+      "El password debe tener entre 8 y 16 caracteres, incluir al menos un número, una letra mayúscula, una letra minúscula y un carácter especial"
+    ),
 ];
 
 export default validarUsuario;
