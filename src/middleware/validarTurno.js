@@ -7,6 +7,16 @@ const validacionTurno = [
     .withMessage("El ID de la cancha es obligatorio")
     .isMongoId()
     .withMessage("El ID de la cancha debe ser un ObjectId válido"),
+  body("usuarioId")
+    .notEmpty()
+    .withMessage("El ID del usuario es obligatorio")
+    .isMongoId()
+    .withMessage("El ID del usuario debe ser un ObjectId válido"),
+  body("usuarioNombre")
+    .notEmpty()
+    .withMessage("El nombre del usuario es obligatorio")
+    .isLength({ min: 2, max: 100 })
+    .withMessage("El nombre del usuario debe tener entre 2 y 100 caracteres"),
 
   body("fecha")
     .notEmpty()

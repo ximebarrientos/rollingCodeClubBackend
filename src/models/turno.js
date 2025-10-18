@@ -7,6 +7,15 @@ const turnoSchema = new Schema(
       ref: "cancha",
       required: true,
     },
+    usuarioId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "usuario",
+      required: true,
+    },
+    nombreUsuario: {
+      type: String,
+      required: true,
+    },
     fecha: {
       type: Date,
       required: true,
@@ -16,9 +25,6 @@ const turnoSchema = new Schema(
       enum: ["18:30-20:00", "20:00-21:30", "21:30-23:00", "23:30-00:30"],
       required: true,
     },
-    // campos adicionales opcionales
-    // clienteId: { type: mongoose.Schema.Types.ObjectId, ref: "client" },
-    // estado: { type: String, enum: ["reservado", "cancelado"], default: "reservado" }
   },
   { timestamps: true }
 );

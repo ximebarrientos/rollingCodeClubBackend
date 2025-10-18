@@ -3,7 +3,7 @@ import Cancha from "../models/cancha.js";
 
 export const crearTurno = async (req, res) => {
   try {
-    const { canchaId, fecha, horario } = req.body;
+    const { canchaId, usuarioId, usuarioNombre, fecha, horario } = req.body;
 
     // verificar que la cancha existe
     const cancha = await Cancha.findById(canchaId);
@@ -30,7 +30,7 @@ export const crearTurno = async (req, res) => {
     // el indice unico en el modelo se encarga de evitar duplicados
     // si ya existe un turno para cancha, fecha y horario, mongoose lanzará un error de validación
 
-    const turnoNuevo = new Turno({ canchaId, fecha: fechaSolicitada, horario });
+    const turnoNuevo = new Turno({ canchaId, usuarioId, nombreUsuario: usuarioNombre, fecha: fechaSolicitada, horario });
     await turnoNuevo.save();
 
     res.status(201).json({ mensaje: "Turno reservado con éxito", turno: turnoNuevo });
