@@ -114,6 +114,7 @@ const validarUsuario = [
     .withMessage(
       "El password debe tener entre 8 y 16 caracteres, incluir al menos un número, una letra mayúscula, una letra minúscula y un carácter especial"
     ),
+    (req, res, next) => resultadoValidacion(req, res, next),
 ];
 
 export default validarUsuario;
