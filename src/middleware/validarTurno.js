@@ -28,18 +28,15 @@ const validacionTurno = [
       const fechaTurno = new Date(value);
       const ahora = new Date();
 
-      // Resetear horas para comparar solo fechas
       const fechaSolo = new Date(fechaTurno);
       fechaSolo.setHours(0, 0, 0, 0);
       const hoySolo = new Date(ahora);
       hoySolo.setHours(0, 0, 0, 0);
 
-      // Si es fecha pasada, rechazar
       if (fechaSolo < hoySolo) {
         throw new Error("No se pueden reservar turnos para fechas pasadas");
       }
 
-      // Si es hoy, verificar horario
       if (fechaSolo.getTime() === hoySolo.getTime()) {
         const [horaInicio] = req.body.horario
           .split("-")

@@ -118,7 +118,7 @@ El servidor iniciará en `http://localhost:3000` por defecto.
 
 ## Endpoints de la API
 
-[Mira la documentación aqui] AQUI IRIA EL LINK DE LA DOCUMENTACION DE POSTMAN
+[Mira la documentación aquí](https://documenter.getpostman.com/view/37059192/2sB3QRm6w2)
 
 ## Link del repositorio del Frontend
 - https://github.com/ximebarrientos/rollingCodeClub
