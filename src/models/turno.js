@@ -29,7 +29,6 @@ const turnoSchema = new Schema(
   { timestamps: true }
 );
 
-// indice compuesto para asegurar unicidad de turnos por cancha, fecha y horario
 turnoSchema.index({ canchaId: 1, fecha: 1, horario: 1 }, { unique: true });
 
 const Turno = mongoose.model("turno", turnoSchema);
