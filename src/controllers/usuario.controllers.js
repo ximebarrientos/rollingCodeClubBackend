@@ -237,6 +237,7 @@ export const login = async (req, res) => {
         genero: usuarioEncontrado.genero,
         celular: usuarioEncontrado.celular,
         correoElectronico: usuarioEncontrado.correoElectronico,
+        estado: usuarioEncontrado.estado,
       },
       token,
     });
